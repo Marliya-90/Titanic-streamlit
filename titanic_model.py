@@ -1,16 +1,20 @@
 import streamlit as st
 import numpy as np
-import joblib  # to load model
+import joblib
 import pandas as pd
 
-
-model = joblib.load("titanic_model.pkl")  # your model file
+# ------------------------------
+# Load the trained model
+# ------------------------------
+model = joblib.load("titanic_model.pkl")  # make sure this file is in your repo
 
 st.set_page_config(page_title="Titanic Survival Predictor 🚢", layout="centered")
 st.title("🚢 Titanic Survival Prediction")
 st.write("Enter passenger details to predict whether they would survive or not:")
 
-
+# ------------------------------
+# USER INPUTS
+# ------------------------------
 col1, col2 = st.columns(2)
 
 with col1:
@@ -23,13 +27,18 @@ with col2:
     Parch = st.number_input("Number of Parents/Children aboard", min_value=0, max_value=10, value=0)
     Fare = st.number_input("Fare", min_value=0.0, max_value=1000.0, value=32.0)
 
+# Convert categorical to numeric (for future multi-feature models)
 Sex_numeric = 0 if Sex == "male" else 1
 
+# ------------------------------
+# Prepare input for prediction
+# ------------------------------
+# Your current model expects 1 feature, so we only pass Fare
+input_data = np.array([[Fare]])
 
-
-input_data = np.array([[Fare]])  # only the feature your model was trained on
-
-
+# ------------------------------
+# PREDICTION
+# ------------------------------
 if st.button("Predict"):
     try:
         prediction = model.predict(input_data)
@@ -46,8 +55,9 @@ if st.button("Predict"):
     except Exception as e:
         st.error(f"Prediction failed: {e}")
 
-
+# ------------------------------
+# Optional: Show sample dataset
+# ------------------------------
 if st.checkbox("Show sample dataset"):
     df = pd.read_csv("titanic.csv")
     st.dataframe(df.head(10))
-
